@@ -6,6 +6,7 @@ import requests
 import sklearn.model_selection
 from bs4 import BeautifulSoup
 from sklearn.ensemble import RandomForestRegressor
+
 website = 'https://www.worldometers.info/coronavirus/#countries'
 socket.getaddrinfo('localhost', 8080)
 website_url = requests.get(website).text
@@ -60,12 +61,14 @@ for row in my_table.findAll('tr'):
         y = df2["infection_rate"]
         # Split the data into training and test sets
 
+
 x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(x_train=0.25, x_test=0.75)
 # n_arrays = len(df2)
 # x_train.shape, x_test.shape, y_train.shape, y_test.shape
 
 # Evaluating the model on the test set
 #  clf.score(x_test, y_test)
+
 # from sklearn.model_selection import cross_val_score
 
 #  cross-validation# np.random.seed(42)
@@ -93,3 +96,5 @@ pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "
 
 # Load a saved model
 loaded_pickle_model_r = pickle.load(open("RandomForestRegressor_model_1.pkl", "rb"))
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
