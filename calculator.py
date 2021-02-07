@@ -1,7 +1,7 @@
 INTEGER, PLUS, MINUS, MULTIPLY, DIV, EOF = 'INTEGER', 'PLUS', 'MINUS', 'MULTIPLY', 'DIV', 'EOF'
 
 
-class Token():
+class Token:
     def __init__(self, type, value):
         self.type = type
         self.value = value
@@ -16,7 +16,7 @@ class Token():
         return self.__str__()
 
 
-class Interpreter():
+class Interpreter:
 
     def __init__(self, text):
         self.text = text
@@ -27,7 +27,7 @@ class Interpreter():
     def error(self, error="Error parsing input"):
         raise Exception(error)
 
-    def handlePosition(self):
+    def handleposition(self):
         self.position += 1
         if self.position > len(self.text):
 
@@ -37,10 +37,10 @@ class Interpreter():
 
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
-            self.handlePosition()
+            self.handleposition()
 
     def skip(self):
-        self.handlePosition()
+        self.handleposition()
 
     def _alpha(self):
         chars = tuple((chr(i) for i in range(ord('a'), ord('z') + 1))) + tuple((chr(i) for i in range(ord('A'), ord('Z') + 1)))
@@ -58,11 +58,11 @@ class Interpreter():
         result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
-            self.handlePosition()
+            self.handleposition()
             # Enable floating point number.
             if self.current_char == '.':
                 result += self.current_char
-                self.handlePosition()
+                self.handleposition()
         return float(result)
 
     def tokenizer(self):
@@ -80,17 +80,17 @@ class Interpreter():
             if self.current_char.isdigit():
                 return Token(INTEGER, self._num())
             if self.current_char == '+':
-                self.handlePosition()
+                self.handleposition()
                 return Token(PLUS, '+')
 
             if self.current_char == '-':
-                self.handlePosition()
+                self.handleposition()
                 return Token(MINUS, '-')
             if self.current_char == '*':
-                self.handlePosition()
+                self.handleposition()
                 return Token(MULTIPLY, "*")
             if self.current_char == '/':
-                self.handlePosition()
+                self.handleposition()
                 return Token(DIV, "/")
             self.error()
         return Token(EOF, None)
@@ -144,4 +144,4 @@ def main():
 
 
 if __name__ == "__main__":
-   main()
+      main()
