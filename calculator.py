@@ -29,8 +29,8 @@ class Interpreter():
 
     def handlePosition(self):
         self.position += 1
-        if self.position > len(self.text) - 1:
-            # Indicates end of input
+        if self.position > len(self.text):
+
             self.current_char = None
         else:
             self.current_char = self.text[self.position]
@@ -143,6 +143,6 @@ def main():
         print(result)
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__calculator__":
+   calculator()
 
