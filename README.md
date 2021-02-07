@@ -1,1 +1,1 @@
-# Rate
+# Simple App
