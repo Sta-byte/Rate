@@ -1,4 +1,4 @@
-import pandas as pd
+import numpy as np
 import streamlit as st
 st.title('  Welcome to My App')
 s=st.text_input('What is your name?')
