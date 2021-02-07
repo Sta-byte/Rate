@@ -143,6 +143,5 @@ def main():
         print(result)
 
 
-if __name__ == "__calculator__":
-   calculator()
-
+if __name__ == "__main__":
+   main()
