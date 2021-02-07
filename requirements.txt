@@ -1,5 +1,6 @@
 absl-py==0.10.0
 alabaster==0.7.12
+altair==4.1.0
 anaconda-client==1.7.2
 anaconda-navigator==1.9.12
 anaconda-project==0.8.3
@@ -7,6 +8,7 @@ appdirs==1.4.4
 argh==0.26.2
 asgiref==3.2.10
 asn1crypto==1.3.0
+astor==0.8.1
 astroid @ file:///C:/ci/astroid_1592487315634/work
 astropy==4.0.1.post1
 astunparse==1.6.3
@@ -19,11 +21,13 @@ backports.functools-lru-cache==1.6.1
 backports.shutil-get-terminal-size==1.0.0
 backports.tempfile==1.0
 backports.weakref==1.0.post1
+base58==2.1.0
 bcrypt==3.1.7
 beautifulsoup4==4.9.1
 bitarray @ file:///C:/ci/bitarray_1594751093906/work
 bkcharts==0.2
 bleach==3.1.5
+blinker==1.4
 bokeh @ file:///C:/ci/bokeh_1593178781838/work
 boto==2.49.0
 Bottleneck==1.3.2
@@ -76,6 +80,8 @@ future==0.18.2
 gast==0.3.3
 gevent @ file:///C:/ci/gevent_1593005471151/work
 gevent-websocket==0.10.1
+gitdb==4.0.5
+GitPython==3.1.12
 glob2==0.7
 gmpy2==2.0.8
 google-auth==1.22.1
@@ -179,12 +185,14 @@ prompt-toolkit==3.0.5
 protobuf==3.13.0
 psutil==5.7.0
 py @ file:///tmp/build/80754af9/py_1593446248552/work
+pyarrow==3.0.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycodestyle==2.6.0
 pycosat==0.6.3
 pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
 pycurl==7.43.0.5
+pydeck==0.5.0
 pydocstyle @ file:///tmp/build/80754af9/pydocstyle_1592848020240/work
 pyflakes==2.2.0
 Pygments==2.6.1
@@ -231,6 +239,7 @@ simplegeneric==0.8.1
 singledispatch==3.4.0.3
 sip==4.19.13
 six==1.15.0
+smmap==3.0.5
 snowballstemmer==2.0.0
 sortedcollections==1.2.1
 sortedcontainers==2.2.2
@@ -248,6 +257,7 @@ spyder-kernels @ file:///C:/ci/spyder-kernels_1594751670175/work
 SQLAlchemy @ file:///C:/ci/sqlalchemy_1593445271541/work
 sqlparse==0.4.1
 statsmodels==0.11.1
+streamlit==0.76.0
 sympy @ file:///C:/ci/sympy_1594234545115/work
 tables==3.6.1
 tangled-up-in-unicode==0.0.6
@@ -268,9 +278,11 @@ tornado==6.0.4
 tqdm @ file:///tmp/build/80754af9/tqdm_1593446365756/work
 traitlets==4.3.3
 typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1592847887441/work
+tzlocal==2.1
 ujson==1.35
 unicodecsv==0.14.1
 urllib3==1.25.9
+validators==0.18.2
 virtualenv==20.1.0
 visions==0.5.0
 watchdog @ file:///C:/ci/watchdog_1593447437088/work
