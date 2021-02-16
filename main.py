@@ -1,39 +1,89 @@
-from random import *
-
-import dash
-import dash_html_components as html
-import dash_core_components as dcc
-import plotly.graph_objects as go
 import pandas as pd
-from dash.dependencies import Input, Output
+import numpy as np
 import requests
-import json
+from bs4 import BeautifulSoup
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+import sklearn.model_selection
 
 
-# Initialize the app
-password = dash.Dash(__name__)
-#app.config.suppress_callback_exceptions = True
+website='https://backlinko.com/social-media-users'
+website_url=requests.get(website).text
+soup = BeautifulSoup(website_url,'html.parser')
+my_table = soup.find('tbody')
+print(soup.prettify())
+my_table = soup.find('table')
+df = pd.DataFrame(my_table)
+soup.title
+table_data = []
+for row in my_table.findAll('tr'):
+    row_data = []
+    for cell in row.findAll('td'):
+        row_data.append(cell.text)
+    if (len(row_data)>0):
+        data_item = {"Social_network": row_data[0],
+                     "Male_(% usage)": row_data[1],
+                     "Female_(% usage)": row_data[2],
 
-user_pass=input("Enter your password")
+                     }
+        table_data.append(data_item)
+        df = pd.DataFrame(table_data)
+        df.to_excel('data.xlsx', index=True)
+        df.shape
+        df.isnull().sum()
+        df.info()
+        df['Male_(% usage)'] = pd.to_numeric(df['Male_(% usage)'], errors='coerce').astype('Int64')
+        df['Female_(% usage)'] = pd.to_numeric(df['Female_(% usage)'], errors='coerce').astype('Int64')
+        df.info()
+        df
+        df['Social_Media_Users(Total%)'] = df['Male_(% usage)'] + df['Female_(% usage)']
+        df
+        # SOCIAL MEDIA USAGE
+        df_quantity = df.groupby(["Social_Media_Users(Total%)"])["Social_network"].sum().reset_index()
+        plt.figure(figsize=(15, 10))
+        sns.barplot(x="Social_Media_Users(Total%)", y="Social_network", data=df_quantity)
+        plt.title("Social Network % Usage")
+        plt.xlabel("usage")
+        plt.ylabel("Social_Network")
 
-password =['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p',
-           'q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8','9','0']
-guess=""
+        # SOCIAL MEDIA USAGE
+        df_quantity = df.groupby(["Social_Media_Users(Total%)"])["Social_network"].sum().reset_index()
+        plt.figure(figsize=(15, 10))
+        sns.relplot(x="Social_Media_Users(Total%)", y="Social_network", data=df_quantity)
+        plt.title("Social Network % Usage")
+        plt.xlabel("usage")
+        plt.ylabel("Social_Network")
 
-while(guess !=user_pass):
-    guess=""
-    for letter in range(len(user_pass)):
-        guess_letter=password[randint(0,27)]
-        guess=str(guess_letter)+str(guess)
+        df1 = df.drop(['Social_network'], axis=1)
+        df1
+        # Creating x (all the feature columns)
+        x = df1.drop("Social_Media_Users(Total%)", axis=1)
+        # Creating y (the target column)
+        y = df1["Social_Media_Users(Total%)"]
+        x.shape
+        y.shape
+
+        # Split the data into training and test sets
+
+        from sklearn.model_selection import train_test_split
+
+        xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.2, random_state=0)
+
+        # Random Forest
+        from sklearn.ensemble import RandomForestClassifier
+
+        model_r = RandomForestRegressor()
+    model_r.fit(xtrain, ytrain)
+
+    import pickle
+
+    # Saving
+    pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
+
+    # Load a saved model
+    loaded_pickle_model_r = pickle.load(open("RandomForestRegressor_model_1.pkl", "rb"))
 
 
-print(guess)
-print("Your password is",guess)
-
-
-
-
-
-if __name__ == '__main__':
-    password.run_server(debug=True,port=600)
-
+if __name__ == "__main__":
+    main ()
