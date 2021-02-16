@@ -1,16 +1,17 @@
+
 import pandas as pd
-import numpy as np
+import bs4
 import requests
 from bs4 import BeautifulSoup
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 import sklearn.model_selection
+import pickle
 
-
-website='https://backlinko.com/social-media-users'
-website_url=requests.get(website).text
-soup = BeautifulSoup(website_url,'html.parser')
+website = 'https://backlinko.com/social-media-users'
+website_url = requests.get(website).text
+soup = BeautifulSoup(website_url, 'html.parser')
 my_table = soup.find('tbody')
 print(soup.prettify())
 my_table = soup.find('table')
@@ -68,15 +69,17 @@ for row in my_table.findAll('tr'):
 
         from sklearn.model_selection import train_test_split
 
-        xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.2, random_state=0)
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
 
         # Random Forest
         from sklearn.ensemble import RandomForestClassifier
 
-        model_r = RandomForestRegressor()
-    model_r.fit(xtrain, ytrain)
+    model = RandomForestRegressor()
+    np.random.seed(50)  
+    model.fit(x_train, y_train)
 
-    import pickle
+
 
     # Saving
     pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
@@ -85,5 +88,3 @@ for row in my_table.findAll('tr'):
     loaded_pickle_model_r = pickle.load(open("RandomForestRegressor_model_1.pkl", "rb"))
 
 
-if __name__ == "__main__":
-    main ()
