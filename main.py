@@ -77,9 +77,9 @@ for row in my_table.findAll('tr'):
 
     model = RandomForestRegressor()
 
-    model.fit(x_train, y_trai
+    model.fit(x_train, y_train)
     # Saving
-    pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
+    Pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
 
     # Load a saved model
     loaded_pickle_model_r = pickle.load(open("RandomForestRegressor_model_1.pkl", "rb"))
