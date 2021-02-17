@@ -68,8 +68,8 @@ for row in my_table.findAll('tr'):
 
         from sklearn.model_selection import train_test_split
 
-        x_test: x_test
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=0)
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=8)
 
         # Random Forest
     from sklearn.ensemble import RandomForestClassifier
@@ -77,8 +77,7 @@ for row in my_table.findAll('tr'):
     model = RandomForestRegressor()
     from sklearn.model_selection import train_test_split
 
-    [x_train, x_test, y_train, y_test] = train_test_split(x, y, test_size=0.33, random_state=42)
-    model.fit(x_train, y_train)
+
     # Saving
     pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
 
