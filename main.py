@@ -1,6 +1,5 @@
-
-import pandas as pd
 import bs4
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import seaborn as sns
@@ -76,7 +75,7 @@ for row in my_table.findAll('tr'):
         from sklearn.ensemble import RandomForestClassifier
 
     model = RandomForestRegressor()
-    np.random.seed(50)  
+
     model.fit(x_train, y_train)
 
 
