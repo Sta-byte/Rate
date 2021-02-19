@@ -1,164 +1,69 @@
-import pandas as pd
-import numpy as np
-import requests
-from bs4 import BeautifulSoup
+import pickle, nltk
+from stopwords import stopwords, is_stopword
+from nltk import TextCollection, Text
+from pprint import pprint
+from copy import copy
+import time
+from nltk.corpus import brown
 
-import seaborn as sns
+with open("l2.pickle") as f:
+    lyrics = pickle.load(f)
 
-website='https://www.worldometers.info/coronavirus/#countries'
-import socket
-socket.getaddrinfo('localhost', 8080)
+tags = ["love", "motivation",  "sadness"]
+print (tags)
+with open("/usr/share/dict/american-english") as dico:
+    dict_words = list(dico.readlines())
 
-website_url=requests.get(website).text
+def valid(tag):
+    return tag and (tag.startswith("VB") or tag.startswith("JJ"))
 
-soup = BeautifulSoup(website_url,'html.parser')
+def all_words(lyrics):
+    for l in lyrics:
+        for w in nltk.word_tokenize(" ".join(l["lyrics"])):
+#             print w, unigram_tagger.tag([w])
+             if l.get("title") and (not is_stopword(w)) and valid(unigram_tagger.tag([w])[0][1]):
+                yield w.lower()
 
-my_table = soup.find('tbody')
-import matplotlib.pyplot as plt
-
-table_data = []
-for row in my_table.findAll('tr'):
-    row_data = []
-    for cell in row.findAll('td'):
-        row_data.append(cell.text)
-    if(len(row_data) > 0):
-        data_item = {"Country": row_data[1],
-                     "TotalCases": row_data[2],
-                     "NewCases": row_data[3],
-                     "TotalDeaths": row_data[4],
-                     "NewDeaths": row_data[5],
-                     "TotalRecovered": row_data[6],
-                     "ActiveCases": row_data[7],
-                     "CriticalCases": row_data[8],
-                     "Totcase1M": row_data[9],
-                     "Totdeath1M": row_data[10],
-                     "TotalTests": row_data[11],
-                     "Tottest1M": row_data[12],
-        }
-        table_data.append(data_item)
-
-        df = pd.DataFrame(table_data)
-
-        df.to_excel('Covid19_data.xlsx', index=True)
-
-        df.shape
-
-        df.isnull().sum()
-
-        df.info()
-
-        df['TotalCases'] = pd.to_numeric(df['TotalCases'], errors='coerce')
-        df['NewCases'] = pd.to_numeric(df['NewCases'], errors='coerce')
-        df['TotalDeaths'] = pd.to_numeric(df['TotalDeaths'], errors='coerce')
-        df['NewDeaths'] = pd.to_numeric(df['NewDeaths'], errors='coerce')
-        df['TotalRecovered'] = pd.to_numeric(df['TotalRecovered'], errors='coerce')
-        df['ActiveCases'] = pd.to_numeric(df['ActiveCases'], errors='coerce')
-        df['CriticalCases'] = pd.to_numeric(df['CriticalCases'], errors='coerce')
-        df['Totcase1M'] = pd.to_numeric(df['Totcase1M'], errors='coerce')
-        df['Totdeath1M'] = pd.to_numeric(df['Totdeath1M'], errors='coerce')
-
-        df['Totdeath1M'] = pd.to_numeric(df['Totdeath1M'], errors='coerce')
-
-        df1 = df.drop(columns=['Country', 'Tottest1M', 'Totdeath1M', 'Totcase1M', 'TotalTests'])
-
-        df1.describe()
-
-        df2 = df1.fillna(df.mean())
-        df2
-
-        df2.isnull().sum()
-
-        df2['infection_rate'] = df2['NewCases'] / df2['TotalCases'] * 100
+def document_features(document):
+    document_words = set(document)
+    features = {}
+    for word in word_features:
+        features['contains(%s)' % word] = (word in document_words)
+    return features
 
 
+def divide_lyrics(lyric):
+    for t in lyric["tags"]:
+        if t in tags:
+            l = copy(lyric)
+            l["tags"] = t
+            yield l
 
-        df2.info()
+brown_tagged_sents = brown.tagged_sents(categories='news')
+brown_sents = brown.sents(categories='news')
+unigram_tagger = nltk.UnigramTagger(brown_tagged_sents)
+unigram_tagger.tag(brown_sents[2007])
 
-        df2.head()
-        vmax = np.nanmax(df2)
-        vmin = np.nanmin(df2)
-        # Creating x (all the feature columns)
-        x = df2.drop("infection_rate", axis=1)
+lyrics = [l for l in lyrics if l.get("title")]
+aw = nltk.FreqDist(all_words(lyrics))
+word_features = sorted(aw.keys())
+#all_words = nltk.FreqDist(w.lower() for l in lyrics for w in nltk.word_tokenize(" ".join(l["lyrics"])) if l.get("title") if not is_stopword(w))
+#word_features = sorted(all_words.keys())
 
-        # Creating y (the target column)
-        y = df2["infection_rate"]
+print (word_features)
+lyrics = [dl for l in lyrics for dl in divide_lyrics(l)]
 
-        # Using Pearson Correlation
-        plt.figure(figsize=(12, 10))
-        cor = df2.corr()
-        sns.heatmap(cor, annot=True, cmap=plt.cm.Reds)
-        plt.show()
+t = time.time()
+featuresets = [(document_features(l["lyrics"]), l["tags"]) for l in lyrics]
+train_set, test_set = featuresets[100:], featuresets[:100]
+classifier = nltk.NaiveBayesClassifier.train(train_set)
 
-        graph = sns.relplot(x="TotalRecovered", y="infection_rate", data=df2)
+#print document_features(lyrics[1]["lyrics"])
+print (time.time() - t)
+print (nltk.classify.accuracy(classifier, test_set))
 
-
-        # Split the data into training and test sets
-        from sklearn.model_selection import train_test_split
-
-       # x_train, x_test, y_train, y_test = train_test_split(x_train=0.25, x_test=0.75)
-
-       # n_arrays = len(df2)
-       # x_train.shape, x_test.shape, y_train.shape, y_test.shape
-
-
-
-        # Random Forest
-        from sklearn.ensemble import RandomForestClassifier
-
-       # clf = RandomForestClassifier()
-
-        #clf.get_params()
-
-#        clf.fit(x_train, y_train)
-
-      #  x_test.head()
-
-    #    y_preds = clf.predict(x_test)
-
-        # Evaluating the model on the test set
-      #  clf.score(x_test, y_test)
-
-       # from sklearn.model_selection import cross_val_score
-
-        #  cross-validation
-        #np.random.seed(42)
-        #for i in range(10, 100, 10):
-           # print(f"Trying model with {i} estimators...")
-#            model = RandomForestClassifier(n_estimators=i).fit(x_train, y_train)
-           # print(f"Model accuracy on test set: {model.score(x_test, y_test) * 100}%")
-         ##   print(f"Cross-validation score: {np.mean(cross_val_score(model, x, y, cv=5)) * 100}%")
-           # print("")
-
-         #   from sklearn.linear_model import Ridge
-
-          #  np.random.seed(50)
-
-          #  x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, train_size=0.75)
-
-          #  model = Ridge()
-         ##   model.fit(x_train, y_train)
-
-           # model.score(x_test, y_test)
-
-from sklearn.ensemble import RandomForestRegressor
-
-          #  np.random.seed(50)
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25,train_size=0.75)
-
-
-model_r = RandomForestRegressor()
-model_r.fit(x_train, y_train)
-model_r.score(x_test, y_test)
+classifier.show_most_informative_features(100)
 
 
 
 
-import pickle
-
-# Saving
-pickle.dump(RandomForestRegressor(), open("RandomForestRegressor_model_1.pkl", "wb"))
-
-
-# Load a saved model
-loaded_pickle_model_r = pickle.load(open("RandomForestRegressor_model_1.pkl", "rb"))
