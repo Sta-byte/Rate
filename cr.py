@@ -1,69 +1,65 @@
-import pickle, nltk
-from stopwords import stopwords, is_stopword
-from nltk import TextCollection, Text
-from pprint import pprint
-from copy import copy
-import time
-from nltk.corpus import brown
+#from __future__ import print_function
 
-with open("l2.pickle") as f:
-    lyrics = pickle.load(f)
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy
 
-tags = ["love", "motivation",  "sadness"]
-print (tags)
-with open("/usr/share/dict/american-english") as dico:
-    dict_words = list(dico.readlines())
+#Random number generator
+randnumgen = numpy.random
 
-def valid(tag):
-    return tag and (tag.startswith("VB") or tag.startswith("JJ"))
+# Parameters
+learning_rate = 0.01
+training_steps = 1000
 
-def all_words(lyrics):
-    for l in lyrics:
-        for w in nltk.word_tokenize(" ".join(l["lyrics"])):
-#             print w, unigram_tagger.tag([w])
-             if l.get("title") and (not is_stopword(w)) and valid(unigram_tagger.tag([w])[0][1]):
-                yield w.lower()
-
-def document_features(document):
-    document_words = set(document)
-    features = {}
-    for word in word_features:
-        features['contains(%s)' % word] = (word in document_words)
-    return features
+values_X = numpy.asarray([1,2,3,4,5.5,6.75,7.2,8,3.5,4.65,5,1.5,4.32,1.65,6.08])
+values_Y = numpy.asarray([50,60,65,78,89,104,111,122,71,85,79,56,81.8,55.5,98.3])
+iterations = values_X.shape[0]
 
 
-def divide_lyrics(lyric):
-    for t in lyric["tags"]:
-        if t in tags:
-            l = copy(lyric)
-            l["tags"] = t
-            yield l
+# tf float points - graph inputs
+X = tf.placeholder("float")
+Y = tf.placeholder("float")
 
-brown_tagged_sents = brown.tagged_sents(categories='news')
-brown_sents = brown.sents(categories='news')
-unigram_tagger = nltk.UnigramTagger(brown_tagged_sents)
-unigram_tagger.tag(brown_sents[2007])
+# Set the weight and bias
+W = tf.Variable(randnumgen.randn(), name="weight")
+b = tf.Variable(randnumgen.randn(), name="bias")
 
-lyrics = [l for l in lyrics if l.get("title")]
-aw = nltk.FreqDist(all_words(lyrics))
-word_features = sorted(aw.keys())
-#all_words = nltk.FreqDist(w.lower() for l in lyrics for w in nltk.word_tokenize(" ".join(l["lyrics"])) if l.get("title") if not is_stopword(w))
-#word_features = sorted(all_words.keys())
+# Linear model construction
+# y = xw + b
+prediction = tf.add(tf.multiply(X, W), b)
 
-print (word_features)
-lyrics = [dl for l in lyrics for dl in divide_lyrics(l)]
+# The cost method helps to minimize error for gradient descent. This is called mean sqauared error.
+cost = tf.reduce_sum(tf.pow(prediction-Y, 2))/(2*iterations)
 
-t = time.time()
-featuresets = [(document_features(l["lyrics"]), l["tags"]) for l in lyrics]
-train_set, test_set = featuresets[100:], featuresets[:100]
-classifier = nltk.NaiveBayesClassifier.train(train_set)
+#  Note, minimize() knows to modify W and b because Variable objects are trainable=True by default
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
-#print document_features(lyrics[1]["lyrics"])
-print (time.time() - t)
-print (nltk.classify.accuracy(classifier, test_set))
+# Initialize the variables (i.e. assign their default value)
+init = tf.global_variables_initializer()
 
-classifier.show_most_informative_features(100)
+# Start training
+with tf.Session() as sess:
 
+    # Run the initializer
+    sess.run(init)
+
+    # Fit all training data
+    for step in range(training_steps):
+        for (x, y) in zip(values_X, values_Y):
+            sess.run(optimizer, feed_dict={X: x, Y: y})
+            c = sess.run(cost, feed_dict={X: values_X, Y:values_Y})
+            print("Step:", '%04d' % (step+1), "cost=", "{:.9f}".format(c), \
+                "W=", sess.run(W), "b=", sess.run(b))
+
+    print("Successfully completed!")
+    training_cost = sess.run(cost, feed_dict={X: values_X, Y: values_Y})
+    print("Training cost=", training_cost, "W=", sess.run(W), "b=", sess.run(b))
+
+    # Graphic display
+    plt.plot(values_X, values_Y, 'ro', label='Original data')
+    plt.plot(values_X, sess.run(W) * values_X + sess.run(b), label='Fitted line')
+    plt.legend()
+    plt.show()
 
 
 
